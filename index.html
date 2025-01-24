@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decode Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      width: 90vw;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .screen {
+      display: inline-block;
+      font-size: 2rem;
+      letter-spacing: 0.5rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .row {
+      margin: 10px 0;
+    }
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      gap: 10px;
+      justify-content: center;
+    }
+    .keyboard button {
+      width: 80px;
+      height: 80px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .attempts {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .attempt {
+      width: 20px;
+      height: 40px;
+      border-radius: 5px;
+    }
+    .gray {
+      background-color: gray;
+    }
+    .red {
+      background-color: red;
+    }
+    .green {
+      color: white;
+      background-color: green;
+    }
+    .yellow {
+      color: black;
+      background-color: yellow;
+    }
+    .shake {
+      animation: shake 0.3s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="screen">
+      <div class="row" id="prevAttempt">----</div>
+      <div class="row" id="currentInput">----</div>
+    </div>
+    <div class="keyboard" id="keyboard">
+      <button>1</button>
+      <button>2</button>
+      <button>3</button>
+      <button>4</button>
+      <button>5</button>
+      <button>6</button>
+      <button>7</button>
+      <button>8</button>
+      <button>9</button>
+      <button id="clear">Clear</button>
+      <button id="enter">Enter</button>
+    </div>
+    <div class="attempts" id="attempts"></div>
+  </div>
+
+  <script>
+    const prevAttempt = document.getElementById('prevAttempt');
+    const currentInputDisplay = document.getElementById('currentInput');
+    const keyboard = document.getElementById('keyboard');
+    const attempts = document.getElementById('attempts');
+
+    let solution = generateSolution();
+    let currentInput = "";
+    let attemptCount = 0;
+
+    function generateSolution() {
+      const value = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9) + 1).join('');
+      console.log("🚀 ~ generateSolution ~ value:", value)
+      return value
+    }
+
+    function resetGame() {
+      solution = generateSolution();
+      currentInput = "";
+      attemptCount = 0;
+      prevAttempt.innerHTML = "----";
+      currentInputDisplay.innerHTML = "----";
+      attempts.innerHTML = "";
+    }
+
+    function evaluateInput(input) {
+      let result = "";
+
+      for (let i = 0; i < 4; i++) {
+        if (input[i] === solution[i]) {
+          result += `<span class='green'>${input[i]}</span>`;
+        } else if (solution.includes(input[i])) {
+          result += `<span class='yellow'>${input[i]}</span>`;
+        } else {
+          result += `<span class='gray'>${input[i]}</span>`;
+        }
+      }
+
+      return result;
+    }
+
+    keyboard.addEventListener('click', (event) => {
+      const value = event.target.textContent;
+
+      if (!isNaN(value)) {
+        if (currentInput.length < 4) {
+          currentInput += value;
+          currentInputDisplay.textContent = currentInput.padEnd(4, '-');
+        }
+      } else if (value === 'Clear') {
+        currentInput = "";
+        currentInputDisplay.textContent = "----";
+      } else if (value === 'Enter') {
+        if (currentInput.length === 4) {
+          if (currentInput === solution) {
+            currentInputDisplay.innerHTML = evaluateInput(currentInput);
+            alert("Correct! Generating a new code.");
+            resetGame();
+          } else {
+            prevAttempt.innerHTML = evaluateInput(currentInput);
+            attemptCount++;
+            const block = document.createElement('div');
+            block.classList.add('attempt', 'red');
+            attempts.appendChild(block);
+
+            if (attemptCount >= 8) {
+              alert("Out of attempts! Generating a new code.");
+              resetGame();
+            } else {
+              currentInputDisplay.classList.add('shake');
+              setTimeout(() => currentInputDisplay.classList.remove('shake'), 300);
+              currentInput = "";
+              currentInputDisplay.textContent = "----";
+            }
+          }
+        }
+      }
+    });
+
+    resetGame();
+  </script>
+</body>
+</html>
