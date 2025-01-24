@@ -109,14 +109,14 @@
     let attemptCount = 0;
 
     function generateSolution() {
-      let numbers = [];
-      while (numbers.length < 4) {
-        let num = Math.floor(Math.random() * 10).toString();
-        if (!numbers.includes(num)) {
-          numbers.push(num);
+      const digits = [];
+      while (digits.length < 4) {
+        const randomDigit = Math.floor(Math.random() * 10).toString();
+        if (!digits.includes(randomDigit)) {
+          digits.push(randomDigit);
         }
       }
-      return numbers.join('');
+      return digits.join('');
     }
 
     function resetGame() {
@@ -157,13 +157,6 @@
         currentInputDisplay.textContent = "----";
       } else if (value === 'Enter') {
         if (currentInput.length === 4) {
-          if (new Set(currentInput).size !== 4) {
-            alert("Numbers must not repeat!");
-            currentInput = "";
-            currentInputDisplay.textContent = "----";
-            return;
-          }
-
           if (currentInput === solution) {
             currentInputDisplay.innerHTML = evaluateInput(currentInput);
             setTimeout(() => {
